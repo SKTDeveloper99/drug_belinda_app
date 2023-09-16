@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "257978860729",
+    "project_id": "khoatrancodingminds",
+    "storage_bucket": "khoatrancodingminds.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:257978860729:android:a7ad6ca209e41dfca38768",
+        "android_client_info": {
+          "package_name": "com.codingminds.medical_app_belinda_full"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4JirS3CzjGEx3rWOTXic5RFkO3Hqiv_U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
