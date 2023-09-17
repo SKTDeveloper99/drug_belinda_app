@@ -355,17 +355,17 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                       ),
-                      // TextButton(
-                      //   onPressed: () {
-                      //     Navigator.push(context, MaterialPageRoute(builder: (context) =>  const CalendarPage()));
-                      //   },
-                      //   child: const Text(
-                      //     'Calendar',
-                      //     style: TextStyle(
-                      //       fontSize: 24,
-                      //     ),
-                      //   ),
-                      // ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) =>  const CalendarPage()));
+                        },
+                        child: const Text(
+                          'Calendar',
+                          style: TextStyle(
+                            fontSize: 24,
+                          ),
+                        ),
+                      ),
                       TextButton(
                         onPressed: () async  {
                           //await NotificationService().showNotification(title: "love",body: "hug");

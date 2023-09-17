@@ -44,13 +44,9 @@ class _CurrentMedsScreenState extends State<CurrentMedsScreen> {
   }
 
   Future<void> init() async {
-
     final database = FirebaseDatabase.instance;
-
     _superSearchTermsRef = database.ref('users/${user.uid}/Drugs');
-
     _messagesRef = database.ref('users/${user.uid}/medLogs');
-
     database.setLoggingEnabled(false);
 
     if (!kIsWeb) {
@@ -110,6 +106,7 @@ class _CurrentMedsScreenState extends State<CurrentMedsScreen> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     if (!initialized) {
@@ -121,7 +118,6 @@ class _CurrentMedsScreenState extends State<CurrentMedsScreen> {
       ),
     );
     }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Current Meds'),

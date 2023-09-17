@@ -1,6 +1,4 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// import 'package:flutter_timezone/flutter_timezone.dart';
-// import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
@@ -41,8 +39,8 @@ class NotificationService {
   Future<void> zonedScheduleAlarmClockNotification() async {
     await notificationsPlugin.zonedSchedule(
         123,
-        'scheduled alarm clock title',
-        'scheduled alarm clock body',
+        'Medical Reminder',
+        'You have to take some medicines now',
         tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5)),
         const NotificationDetails(
             android: AndroidNotificationDetails(
