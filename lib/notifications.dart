@@ -1,53 +1,83 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 
-class NotificationService {
-  final FlutterLocalNotificationsPlugin notificationsPlugin =
+class NotificationHelper {
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
 
-  Future<void> initNotification() async {
-    AndroidInitializationSettings initializationSettingsAndroid =
-    const AndroidInitializationSettings('flutter_logo');
+  /// Initialize notification
+  initializeNotification() async {
+    const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings();
 
-    var initializationSettingsIOS = DarwinInitializationSettings(
-        requestAlertPermission: true,
-        requestBadgePermission: true,
-        requestSoundPermission: true,
-        onDidReceiveLocalNotification:
-            (int id, String? title, String? body, String? payload) async {});
+    const AndroidInitializationSettings initializationSettingsAndroid =
+    AndroidInitializationSettings("@mipmap/ic_launcher");
 
-    var initializationSettings = InitializationSettings(
-        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
-    await notificationsPlugin.initialize(initializationSettings,
-        onDidReceiveNotificationResponse:
-            (NotificationResponse notificationResponse) async {});
+    const InitializationSettings initializationSettings = InitializationSettings(
+      iOS: initializationSettingsIOS,
+      android: initializationSettingsAndroid,
+    );
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
-  notificationDetails() {
-    return const NotificationDetails(
-        android: AndroidNotificationDetails('channelId', 'channelName',
-            importance: Importance.max),
-        iOS: DarwinNotificationDetails());
+  /// Set right date and time for notifications
+  tz.TZDateTime _convertTime(int hour, int minutes) {
+    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+    tz.TZDateTime scheduleDate = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minutes,
+    );
+    if (scheduleDate.isBefore(now)) {
+      scheduleDate = scheduleDate.add(const Duration(days: 1));
+    }
+    return scheduleDate;
   }
 
-  Future showNotification(
-      {int id = 0, String? title, String? body, String? payLoad}) async {
-    return notificationsPlugin.show(
-        id, title, body, await notificationDetails());
+
+  /// Scheduled Notification
+  scheduledNotification({
+    required int hour,
+    required int minutes,
+    required int id,
+    //required String sound,
+  }) async {
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      id,
+      'It\'s time to take your Medicine!',
+      'After drinking, touch the cup to confirm',
+      _convertTime(hour, minutes),
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'your channel id sound',
+          'your channel name',
+          channelDescription: 'your channel description',
+          importance: Importance.max,
+          priority: Priority.high,
+          //sound: RawResourceAndroidNotificationSound(sound),
+        ),
+        iOS: DarwinNotificationDetails(),
+      ),
+      //androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.time,
+      payload: 'It could be anything you pass',
+    );
   }
 
-  Future<void> zonedScheduleAlarmClockNotification() async {
-    await notificationsPlugin.zonedSchedule(
-        123,
-        'Medical Reminder',
-        'You have to take some medicines now',
-        tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5)),
-        const NotificationDetails(
-            android: AndroidNotificationDetails(
-                'alarm_clock_channel', 'Alarm Clock Channel',
-                channelDescription: 'Alarm Clock Notification')),
-        androidScheduleMode: AndroidScheduleMode.alarmClock,
-        uiLocalNotificationDateInterpretation:
-        UILocalNotificationDateInterpretation.absoluteTime);
+  /// Request IOS permissions
+  void requestIOSPermissions() {
+    flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
   }
+
+  cancelAll() async => await flutterLocalNotificationsPlugin.cancelAll();
+  cancel(id) async => await flutterLocalNotificationsPlugin.cancel(id);
 }

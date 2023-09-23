@@ -15,7 +15,7 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('TableCalendar Example'),
+        title: const Text('TableCalendar'),
       ),
       body: Center(
         child: Column(
@@ -39,15 +39,15 @@ class _CalendarPageState extends State<CalendarPage> {
             // ),
             // const SizedBox(height: 12.0),
             ElevatedButton(
-              child: Text('Events'),
+              child: const Text('Events'),
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => TableEventsExample()),
+                MaterialPageRoute(builder: (_) => const TableEventsExample()),
               ),
             ),
             const SizedBox(height: 12.0),
             ElevatedButton(
-              child: Text('Multiple Selection'),
+              child: const Text('Multiple Selection'),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => TableMultiExample()),

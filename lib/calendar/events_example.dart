@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:medical_app_belinda_full/calendar/utils.dart';
+import 'package:medical_app_belinda_full/notifications.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -54,24 +55,6 @@ class TableEventsExampleState extends State<TableEventsExample> {
         UILocalNotificationDateInterpretation.absoluteTime);
   }
 
-  Future<void> showNotificationWithCustomTimestamp(String title, String body) async {
-    final AndroidNotificationDetails androidNotificationDetails =
-    AndroidNotificationDetails(
-      'your channel id',
-      'your channel name',
-      channelDescription: 'your channel description',
-      importance: Importance.max,
-      priority: Priority.high,
-      when: DateTime.now().millisecondsSinceEpoch - 120 * 1000,
-      usesChronometer: true,
-      chronometerCountDown: true,
-    );
-    final NotificationDetails notificationDetails =
-    NotificationDetails(android: androidNotificationDetails);
-    await flutterLocalNotificationsPlugin.show(
-        0, title, "You have studied for: $body", notificationDetails,
-        payload: 'item x');
-  }
 
   List<Event> _getEventsForDay(DateTime day) {
     // Implementation example
@@ -124,7 +107,7 @@ class TableEventsExampleState extends State<TableEventsExample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('TableCalendar - Events'),
+        title: const Text('TableCalendar - Events'),
       ),
       body: Column(
         children: [
@@ -175,8 +158,9 @@ class TableEventsExampleState extends State<TableEventsExample> {
                       ),
                       child: ListTile(
                         onTap: () {
-                          showNotificationWithCustomTimestamp("Here is your notifications!", "${value[index]}");
-                          print('${value[index]}');
+                          //NotificationHelper().requestIOSPermissions();
+                          NotificationHelper().scheduledNotification(hour: 13, minutes: 11, id: 1);
+                          // print('${value[index]}');
                         },
                         title: Text('${value[index]}'),
                       ),

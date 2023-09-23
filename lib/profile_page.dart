@@ -366,18 +366,6 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                       ),
-                      TextButton(
-                        onPressed: () async  {
-                          //await NotificationService().showNotification(title: "love",body: "hug");
-                           NotificationService().zonedScheduleAlarmClockNotification();
-                        },
-                        child: const Text(
-                          'Test notifications',
-                          style: TextStyle(
-                            fontSize: 24,
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -419,5 +407,9 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _signOut() async {
     await auth.signOut();
     await GoogleSignIn().signOut();
+    if(mounted) {
+      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+          const AuthInitializingPage()), (Route<dynamic> route) => false);
+    }
   }
 }

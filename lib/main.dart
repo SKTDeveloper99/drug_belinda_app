@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:medical_app_belinda_full/home_page.dart';
 import 'package:medical_app_belinda_full/notifications.dart';
 import 'package:medical_app_belinda_full/profile_page.dart';
+import 'package:medical_app_belinda_full/screens/disclaimer.dart';
 import 'auth/firebase_options.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -19,7 +20,7 @@ late final FirebaseAuth auth;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   _configureLocalTimeZone();
-  NotificationService().initNotification();
+  NotificationHelper().initializeNotification();
   app1 = await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -76,7 +77,7 @@ class AuthInitializingPage extends StatelessWidget {
                     stream: auth.authStateChanges(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        return const BottomNavigationBarPage();
+                        return const DisclaimerScreen();
                       }
                       return const AuthGate();
                     },
