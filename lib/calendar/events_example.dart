@@ -14,6 +14,7 @@ class TableEventsExample extends StatefulWidget {
 }
 
 class TableEventsExampleState extends State<TableEventsExample> {
+
   late final ValueNotifier<List<Event>> _selectedEvents;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
@@ -107,7 +108,7 @@ class TableEventsExampleState extends State<TableEventsExample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TableCalendar - Events'),
+        title: const Text('Events'),
       ),
       body: Column(
         children: [
@@ -159,7 +160,7 @@ class TableEventsExampleState extends State<TableEventsExample> {
                       child: ListTile(
                         onTap: () {
                           //NotificationHelper().requestIOSPermissions();
-                          NotificationHelper().scheduledNotification(hour: 13, minutes: 11, id: 1);
+                          NotificationHelper().scheduledNotification(hour: 11, minutes: 55, id: 1);
                           // print('${value[index]}');
                         },
                         title: Text('${value[index]}'),

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:medical_app_belinda_full/AI_detector/text-detector.dart';
 import 'package:medical_app_belinda_full/calendar/calendar_page.dart';
 import 'package:medical_app_belinda_full/notifications.dart';
 import 'package:medical_app_belinda_full/screens/add_medicine.dart';
@@ -193,7 +194,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 _showPicker();
               },
             ),
-            const Text('Input your lovely Breakfast here!'),
+            const Text('Input your lovely Profile Picture here!'),
           ],
         )
             : Stack(children: [
@@ -313,38 +314,6 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                         ],
                       ),
-                      // const SizedBox(height: 20),
-                      // const SizedBox(height: 20),
-                      // TextButton(
-                      //   onPressed: () async {
-                      //     // Navigator.push(
-                      //     //   context,
-                      //     //   MaterialPageRoute(
-                      //     //       builder: (context) => RealTimeFirebase()),
-                      //     // );
-                      //   },
-                      //   child: const Text('Test Firebase'),
-                      // ),
-                      // TextButton(
-                      //   onPressed: () async {
-                      //     Navigator.push(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //           builder: (context) => const AddMedPage()),
-                      //     );
-                      //   },
-                      //   child: const Text('Forms Page'),
-                      // ),
-                      // TextButton(
-                      //   onPressed: ()   {
-                      //     // Navigator.push(
-                      //     //   context,
-                      //     //   MaterialPageRoute(
-                      //     //       builder: (context) => const ()),
-                      //     // );
-                      //   },
-                      //   child: const Text('Picker Example'),
-                      // ),
                       const Divider(),
                       TextButton(
                         onPressed: _signOut,

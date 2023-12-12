@@ -1,129 +1,151 @@
-import 'dart:collection';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:medical_app_belinda_full/calendar/utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'dart:collection';
 
 
-class TableMultiExample extends StatefulWidget {
+class EventsCalendar extends StatefulWidget {
+  const EventsCalendar({super.key});
+
   @override
-  _TableMultiExampleState createState() => _TableMultiExampleState();
+  _EventsCalendarState createState() => _EventsCalendarState();
 }
 
-class _TableMultiExampleState extends State<TableMultiExample> {
-  final ValueNotifier<List<Event>> _selectedEvents = ValueNotifier([]);
-
-  // Using a `LinkedHashSet` is recommended due to equality comparison override
-  final Set<DateTime> _selectedDays = LinkedHashSet<DateTime>(
-    equals: isSameDay,
-    hashCode: getHashCode,
-  );
-
+class _EventsCalendarState extends State<EventsCalendar> {
+  Map<DateTime, List<Event>> _events =  {};
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
 
   @override
-  void dispose() {
-    _selectedEvents.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _loadEvents();
+  }
+
+  Future<void> _saveEvents() async {
+    final prefs = await SharedPreferences.getInstance();
+    String events = jsonEncode(_events);
+    prefs.setString('events', events);
+    print("love: $prefs");
+  }
+
+  Future<void> _loadEvents() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.containsKey('events')) {
+      String? events = prefs.getString('events');
+      setState(() {
+        print("Hug: $events");
+        // _events = jsonDecode(events!);
+        // _events = LinkedHashMap<DateTime, List<Event>>(
+        //   equals: isSameDay,
+        //   hashCode: getHashCode,
+        // )..addAll(events);
+      });
+    }
   }
 
   List<Event> _getEventsForDay(DateTime day) {
     // Implementation example
-    return kEvents[day] ?? [];
+    return _events[day] ?? [];
   }
-
-  List<Event> _getEventsForDays(Set<DateTime> days) {
-    // Implementation example
-    // Note that days are in selection order (same applies to events)
-    return [
-      for (final d in days) ..._getEventsForDay(d),
-    ];
-  }
-
-  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-    setState(() {
-      _focusedDay = focusedDay;
-      // Update values in a Set
-      if (_selectedDays.contains(selectedDay)) {
-        _selectedDays.remove(selectedDay);
-      } else {
-        _selectedDays.add(selectedDay);
-      }
-    });
-
-    _selectedEvents.value = _getEventsForDays(_selectedDays);
-  }
+  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('TableCalendar - Multi'),
+        title: const Text('TableCalendar - All Events'),
       ),
-      body: Column(
-        children: [
-          TableCalendar<Event>(
-            firstDay: kFirstDay,
-            lastDay: kLastDay,
-            focusedDay: _focusedDay,
-            calendarFormat: _calendarFormat,
-            eventLoader: _getEventsForDay,
-            startingDayOfWeek: StartingDayOfWeek.monday,
-            selectedDayPredicate: (day) {
-              // Use values from Set to mark multiple days as selected
-              return _selectedDays.contains(day);
-            },
-            onDaySelected: _onDaySelected,
-            onFormatChanged: (format) {
-              if (_calendarFormat != format) {
-                setState(() {
-                  _calendarFormat = format;
-                });
-              }
-            },
-            onPageChanged: (focusedDay) {
+      body: TableCalendar(
+        firstDay: kFirstDay,
+        lastDay: kLastDay,
+        focusedDay: _focusedDay,
+        calendarFormat: _calendarFormat,
+        //eventLoader: _events,
+        selectedDayPredicate: (day) {
+          return isSameDay(_selectedDay, day);
+        },
+        onDaySelected: (selectedDay, focusedDay) {
+          if (!isSameDay(_selectedDay, selectedDay)) {
+            // Call `setState()` when updating the selected day
+            setState(() {
+              _selectedDay = selectedDay;
               _focusedDay = focusedDay;
-            },
-          ),
-          ElevatedButton(
-            child: Text('Clear selection'),
-            onPressed: () {
-              setState(() {
-                _selectedDays.clear();
-                _selectedEvents.value = [];
-              });
-            },
-          ),
-          const SizedBox(height: 8.0),
-          Expanded(
-            child: ValueListenableBuilder<List<Event>>(
-              valueListenable: _selectedEvents,
-              builder: (context, value, _) {
-                return ListView.builder(
-                  itemCount: value.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                        vertical: 4.0,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(),
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: ListTile(
-                        onTap: () => print('${value[index]}'),
-                        title: Text('${value[index]}'),
-                      ),
-                    );
+            });
+          }
+        },
+        onFormatChanged: (format) {
+          if (_calendarFormat != format) {
+            // Call `setState()` when updating calendar format
+            setState(() {
+              _calendarFormat = format;
+            });
+          }
+        },
+        onPageChanged: (focusedDay) {
+          // No need to call `setState()` here
+          _focusedDay = focusedDay;
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.black,
+        child: const Icon(Icons.add),
+        onPressed: _showAddDialog,
+      ),
+    );
+  }
+
+  _showAddDialog() async {
+    showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextFormField(
+                  decoration: const InputDecoration(
+                    filled: true,
+                    hintText: 'Enter the title...',
+                    labelText: 'Input your title!',
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      //_events[_selectedDay]!.add(Event(value));
+                      //_saveEvents();
+                    });
                   },
-                );
-              },
+                ),
+                // TextFormField(
+                //   decoration: const InputDecoration(
+                //     filled: true,
+                //     hintText: 'Enter description',
+                //     labelText: 'Input your description!',
+                //   ),
+                //   onChanged: (value) {
+                //     setState(() {
+                //       //name = value;
+                //     });
+                //   },
+                // ),
+              ],
             ),
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+
+              onPressed: () async {
+                _saveEvents();
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

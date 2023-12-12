@@ -77,7 +77,7 @@ class AuthInitializingPage extends StatelessWidget {
                     stream: auth.authStateChanges(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        return const DisclaimerScreen();
+                        return const SplashScreen();
                       }
                       return const AuthGate();
                     },

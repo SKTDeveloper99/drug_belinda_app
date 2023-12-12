@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:developer';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:medical_app_belinda_full/main.dart';
-import 'package:medical_app_belinda_full/screens/add_medicine.dart';
 import 'package:medical_app_belinda_full/screens/drug_details_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -28,17 +27,24 @@ class _CurrentMedsScreenState extends State<CurrentMedsScreen> {
   List<String>superSearchTerms = [];
   FirebaseException? _error;
   bool initialized = false;
+  List<String> allDrugs = [];
 
   @override
   void initState() {
     user = auth.currentUser!;
-    auth.userChanges().listen((event) {
-      if (event != null && mounted) {
+    List<String> love =[];
+    FirebaseFirestore.instance.collection("BeHealthyAppUsers").doc(user.uid).get().then(
+          (querySnapshot) {
+            querySnapshot.data()!.values.elementAt(0).forEach((element) {
+              love.add(element.toString());
+            });
         setState(() {
-          user = event;
+          allDrugs = love;
         });
-      }
-    });
+      },
+      onError: (e) => print("Error completing: $e"),
+    );
+
     init();
     super.initState();
   }
@@ -93,7 +99,16 @@ class _CurrentMedsScreenState extends State<CurrentMedsScreen> {
   
   Future<void> _deleteMessage(DataSnapshot snapshot) async {
     final messageRef = _messagesRef.child(snapshot.key!);
+    Map love = snapshot.value! as Map;
+    String drug = love["title"];
     await messageRef.remove();
+    await FirebaseFirestore.instance
+        .collection("BeHealthyAppUsers")
+        .doc(user.uid)
+        .update({
+      "drugsUsing": FieldValue.arrayRemove([drug]),
+    }
+    );
   }
 
   void _setAnchorToBottom(bool? value) {
@@ -128,7 +143,7 @@ class _CurrentMedsScreenState extends State<CurrentMedsScreen> {
               showSearch(
                   context: context,
                   // delegate to customize the search bar
-                  delegate: CustomSearchDelegate()
+                  delegate: CustomSearchDelegate(searchTerms: allDrugs),
               );
             },
             icon: const Icon(Icons.search),
@@ -174,48 +189,35 @@ class _CurrentMedsScreenState extends State<CurrentMedsScreen> {
                           ),
                           title: Text(medsList["title"]),
                           subtitle: Text(medsList["description"]),
-                          leading: Image.network(
-                              medsList["medPicURL"] ?? "",
-                              width: 50,
-                              height: 50,
-                           ),
+                          leading: SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: CachedNetworkImage(
+                imageUrl: medsList["medPicURL"] ?? "https:firebasestorage.googleapis.com/v0/b/khoatrancodingminds.appspot.com/o/WechatIMG83.jpg?alt=media&token=90fc2853-7f45-441f-b0de-e83529a86ae0",
+                placeholder: (context, url) => const Center(child:  CircularProgressIndicator()),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
                         ),
+                          ),
                       ),
                     ),
                   ),
-                );
+                ),);
               },
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const AddMedPage()),
-          );
-        },
-        label: const Text('Add Your Prescriptions'),
-        icon: const Icon(Icons.add),
       ),
     );
   }
 }
 
 class CustomSearchDelegate extends SearchDelegate {
+
+  CustomSearchDelegate({required this.searchTerms});
+
 // Demo list to show querying
-  List<String> searchTerms = [
-    "Aspirin",
-    "Benzonatate",
-    "Methadone",
-    "Epclusa",
-    "Plan B",
-    "Prednisone",
-    "Zetia",
-    "Tylernol"
-  ];
+  final List<String> searchTerms;
+
 
 // first overwrite to
 // clear the search text
@@ -226,7 +228,7 @@ class CustomSearchDelegate extends SearchDelegate {
         onPressed: () {
           query = '';
         },
-        icon: Icon(Icons.clear),
+        icon: const Icon(Icons.clear),
       ),
     ];
   }
@@ -234,17 +236,19 @@ class CustomSearchDelegate extends SearchDelegate {
 // second overwrite to pop out of search menu
   @override
   Widget? buildLeading(BuildContext context) {
+
     return IconButton(
       onPressed: () {
         close(context, null);
       },
-      icon: Icon(Icons.arrow_back),
+      icon: const Icon(Icons.arrow_back),
     );
   }
 
 // third overwrite to show query result
   @override
   Widget buildResults(BuildContext context) {
+    //final filteredSearchTerms = searchTerms.where((searchTerm) => searchTerm.toLowerCase().contains(query.toLowerCase())).toList();
     List<String> matchQuery = [];
     for (var fruit in searchTerms) {
       if (fruit.toLowerCase().contains(query.toLowerCase())) {

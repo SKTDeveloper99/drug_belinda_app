@@ -1,12 +1,13 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:medical_app_belinda_full/auth/auth.dart';
 import 'package:medical_app_belinda_full/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart' as intl;
 
@@ -57,14 +58,6 @@ class _AddMedPageState extends State<AddMedPage> {
         });
       }
     });
-
-    // todayDrugRef.onChildAdded.listen((event) {
-    //
-    // });
-    //
-    // drugListRef.onChildAdded.listen((event) {
-    //
-    // });
 
     super.initState();
   }
@@ -130,7 +123,7 @@ class _AddMedPageState extends State<AddMedPage> {
                             border: OutlineInputBorder(),
                             filled: true,
                             hintText: 'Enter your Drug Description...',
-                            labelText: 'Breakfast',
+                            labelText: 'Drug Info',
                           ),
                           onChanged: (value) {
                             description = value;
@@ -233,8 +226,8 @@ class _AddMedPageState extends State<AddMedPage> {
                                     ),
                                     if (scannedTextList == null)
                                       const DropdownMenu(
-                                          onSelected: null,
-                                          dropdownMenuEntries: [],
+                                        onSelected: null,
+                                        dropdownMenuEntries: [],
                                       ),
                                     if (scannedTextList != null)
                                       Column(
@@ -266,40 +259,48 @@ class _AddMedPageState extends State<AddMedPage> {
                           ),
                         ),
                         ElevatedButton(
-                            child: const Text("Update your Drug Now!"),
-                            onPressed: !userInteracts() ? null : () async {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return const Center(
-                                      child: CircularProgressIndicator(),
-                                    );
-                                  });
-                              final drugInput = <String, dynamic>{
-                                "date": date.millisecondsSinceEpoch,
-                                "title": title,
-                                "description": description,
-                                "medPicURL": await uploadDrugPics(key!),
-                                "medURL": "https://www.drugs.com/$title.html",
-                              };
-                              final drugListInput = <String, dynamic> {
-                                title: true,
-                              };
-                              todayDrugRef
-                                  .child(key!)
-                                  .set(drugInput)
-                                  .then((_) => print('Drug has been posted'))
-                                  .catchError((error) => print("You got error on $error"));
-                              drugListRef
-                                  .child(key!)
-                                  .set(drugListInput)
-                                  .then((_) => print('Drug List has been posted'))
-                                  .catchError((error) => print("You got error on $error"));
-                              if (context.mounted) {
-                                Navigator.of(context).pop();
-                              }
-                              updateYourDay();
-                              },
+                          child: const Text("Update your Drug Now!"),
+                          onPressed: !userInteracts() ? null : () async {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                });
+                            final drugInput = <String, dynamic>{
+                              "date": date.millisecondsSinceEpoch,
+                              "title": title,
+                              "description": description,
+                              "medPicURL": await uploadDrugPics(key!),
+                              "medURL": "https://www.drugs.com/$title.html",
+                            };
+                            final drugListInput = <String, dynamic> {
+                              title: true,
+                            };
+                            todayDrugRef
+                                .child(key!)
+                                .set(drugInput)
+                                .then((_) => print('Drug has been posted'))
+                                .catchError((error) => print("You got error on $error"));
+                            drugListRef
+                                .child(key!)
+                                .set(drugListInput)
+                                .then((_) => print('Drug List has been posted'))
+                                .catchError((error) => print("You got error on $error"));
+                            await FirebaseFirestore.instance
+                                .collection("BeHealthyAppUsers")
+                                .doc(user.uid)
+                                .set({
+                                  "drugsUsing": FieldValue.arrayUnion([title]),
+                                },
+                                SetOptions(merge: true)
+                            );
+                            if (context.mounted) {
+                              Navigator.popUntil(context, (route) => route.isFirst);
+                            }
+                            updateYourDay();
+                          },
                         ),
                       ].expand(
                             (widget) => [
@@ -342,7 +343,7 @@ class _AddMedPageState extends State<AddMedPage> {
   void getRecognisedText(XFile image) async {
     List<String> love = [];
     final inputImage = InputImage.fromFilePath(image.path);
-    final textDetector = GoogleMlKit.vision.textRecognizer();
+    final textDetector = TextRecognizer(script: TextRecognitionScript.latin);
     RecognizedText recognisedText = await textDetector.processImage(inputImage);
     await textDetector.close();
     scannedText = "";
@@ -355,7 +356,7 @@ class _AddMedPageState extends State<AddMedPage> {
     }
     textScanning = false;
     setState(() {
-        scannedTextList = love;
+      scannedTextList = love;
     });
   }
 
@@ -416,6 +417,5 @@ class _FormDatePickerState extends State<_FormDatePicker> {
     );
   }
 }
-
 
 

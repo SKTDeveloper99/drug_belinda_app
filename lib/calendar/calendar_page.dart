@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:medical_app_belinda_full/calendar/events_example.dart';
 import 'package:medical_app_belinda_full/calendar/multi_example.dart';
+import 'package:medical_app_belinda_full/screens/doctor_appointment/all_appointments.dart';
+import 'package:medical_app_belinda_full/screens/doctor_appointment/doctor_appointment_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class CalendarPage extends StatefulWidget {
@@ -11,33 +14,18 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TableCalendar'),
+        title: const Text('Your Scheduled Events'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 20.0),
-            // ElevatedButton(
-            //   child: Text('Basics'),
-            //   onPressed: () => Navigator.push(
-            //     context,
-            //     MaterialPageRoute(builder: (_) => TableBasicsExample()),
-            //   ),
-            // ),
-            // const SizedBox(height: 12.0),
-            // ElevatedButton(
-            //   child: Text('Range Selection'),
-            //   onPressed: () => Navigator.push(
-            //     context,
-            //     MaterialPageRoute(builder: (_) => TableRangeExample()),
-            //   ),
-            // ),
-            // const SizedBox(height: 12.0),
             ElevatedButton(
               child: const Text('Events'),
               onPressed: () => Navigator.push(
@@ -47,21 +35,20 @@ class _CalendarPageState extends State<CalendarPage> {
             ),
             const SizedBox(height: 12.0),
             ElevatedButton(
-              child: const Text('Multiple Selection'),
+              child: const Text('Doctor Appointment'),
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => TableMultiExample()),
+                MaterialPageRoute(builder: (_) =>  DoctorAppointmentPage()),
               ),
             ),
-            // const SizedBox(height: 12.0),
+            const SizedBox(height: 12.0),
             // ElevatedButton(
-            //   child: Text('Complex'),
+            //   child: const Text('Upcoming Doctor Appointment'),
             //   onPressed: () => Navigator.push(
             //     context,
-            //     MaterialPageRoute(builder: (_) => TableComplexExample()),
+            //     MaterialPageRoute(builder: (_) =>  const AllAppointments()),
             //   ),
             // ),
-            // const SizedBox(height: 20.0),
           ],
         ),
       ),
