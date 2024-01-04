@@ -155,12 +155,13 @@ class _DrugTodayState extends State<DrugToday> {
                           reverse: _anchorToBottom,
                           itemBuilder: (context, snapshot, animation, index) {
                             final medsList = snapshot.value! as Map;
+                            final medsListKey = snapshot.key;
                             return GestureDetector(
                               onTap: () async {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => DrugDetailScreen(info: medsList)),
+                                      builder: (context) => DrugDetailScreen(info: medsList,medListKey: medsListKey,morning: medsList["morning"],afternoon: medsList["afternoon"], evening: medsList["evening"])),
                                 );
                               },
                               child: SizeTransition(
@@ -235,12 +236,13 @@ class _DrugTodayState extends State<DrugToday> {
                             reverse: _anchorToBottom,
                             itemBuilder: (context, snapshot, animation, index) {
                               final medsList = snapshot.value! as Map;
+                              final medsListKey = snapshot.key;
                               return GestureDetector(
                                 onTap: () async {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => DrugDetailScreen(info: medsList)),
+                                        builder: (context) => DrugDetailScreen(info: medsList,medListKey: medsListKey,morning: medsList["morning"],afternoon: medsList["afternoon"], evening: medsList["evening"])),
                                   );
                                 },
                                 child: SizeTransition(
@@ -315,12 +317,13 @@ class _DrugTodayState extends State<DrugToday> {
                           reverse: _anchorToBottom,
                           itemBuilder: (context, snapshot, animation, index) {
                             final medsList = snapshot.value! as Map;
+                            final medsListKey = snapshot.key;
                             return GestureDetector(
                               onTap: () async {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => DrugDetailScreen(info: medsList)),
+                                      builder: (context) => DrugDetailScreen(info: medsList,medListKey: medsListKey,morning: medsList["morning"],afternoon: medsList["afternoon"], evening: medsList["evening"])),
                                 );
                               },
                               child: SizeTransition(
