@@ -122,18 +122,18 @@ class _DrugTodayState extends State<DrugToday> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Expanded(
+          const Expanded(
             flex: 1,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Morning - In the AMs"),
-                  TextButton(onPressed: () {
-                    _saveDrugsOnTime(state: "morning");
-                  },
-                      child: const Text("Edit"))
+                  Text("Morning - In the AMs"),
+                  // TextButton(onPressed: () {
+                  //   _saveDrugsOnTime(state: "morning");
+                  // },
+                  //     child: const Text("Edit"))
                 ],
               ),
             ),
@@ -151,7 +151,7 @@ class _DrugTodayState extends State<DrugToday> {
                       Flexible(
                         child: FirebaseAnimatedList(
                           key: ValueKey<bool>(_anchorToBottom),
-                          query: _messagesRef.orderByChild("morning").equalTo(true),
+                          query: _messagesRef.orderByChild("morning").equalTo("true"),
                           reverse: _anchorToBottom,
                           itemBuilder: (context, snapshot, animation, index) {
                             final medsList = snapshot.value! as Map;
@@ -203,18 +203,18 @@ class _DrugTodayState extends State<DrugToday> {
               ),
             )
           ),
-          Expanded(
+          const Expanded(
             flex: 1,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Afternoon - In the PMs"),
-                  TextButton(onPressed: () {
-                    _saveDrugsOnTime(state: "Afternoon");
-                  },
-                      child: const Text("Edit"))
+                  Text("Afternoon - In the PMs"),
+                  // TextButton(onPressed: () {
+                  //   _saveDrugsOnTime(state: "Afternoon");
+                  // },
+                  //     child: const Text("Edit"))
                 ],
               ),
             ),
@@ -232,7 +232,7 @@ class _DrugTodayState extends State<DrugToday> {
                         Flexible(
                           child: FirebaseAnimatedList(
                             key: ValueKey<bool>(_anchorToBottom),
-                            query: _messagesRef.orderByChild("afternoon").equalTo(true),
+                            query: _messagesRef.orderByChild("afternoon").equalTo("true"),
                             reverse: _anchorToBottom,
                             itemBuilder: (context, snapshot, animation, index) {
                               final medsList = snapshot.value! as Map;
@@ -284,18 +284,18 @@ class _DrugTodayState extends State<DrugToday> {
                 ),
               ),
           ),
-          Expanded(
+          const Expanded(
             flex: 1,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Evening - In the PMs"),
-                  TextButton(onPressed: () {
-                    _saveDrugsOnTime(state: "Evening");
-                  },
-                      child: const Text("Edit"))
+                  Text("Evening - In the PMs"),
+                  // TextButton(onPressed: () {
+                  //   _saveDrugsOnTime(state: "Evening");
+                  // },
+                  //     child: const Text("Edit"))
                 ],
               ),
             ),
@@ -313,7 +313,7 @@ class _DrugTodayState extends State<DrugToday> {
                       Flexible(
                         child: FirebaseAnimatedList(
                           key: ValueKey<bool>(_anchorToBottom),
-                          query:_messagesRef.orderByChild("evening").equalTo(true),
+                          query:_messagesRef.orderByChild("evening").equalTo("true"),
                           reverse: _anchorToBottom,
                           itemBuilder: (context, snapshot, animation, index) {
                             final medsList = snapshot.value! as Map;
