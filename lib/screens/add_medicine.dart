@@ -10,6 +10,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart' as intl;
+import 'package:medical_app_belinda_full/screens/confirm_page.dart';
 
 class AddMedPage extends StatefulWidget {
   const AddMedPage({super.key});
@@ -43,14 +44,13 @@ class _AddMedPageState extends State<AddMedPage> {
   List<String>? areasFuture; // the data for the second drop down
   bool loading = false;
   late DatabaseReference todayDrugRef;
-  late DatabaseReference drugListRef;
   bool userInteracts() => imageFile != null;
+  final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
     user = auth.currentUser!;
-    // final todayDrugRef = database.child("/users/${user.uid}/medLogs");
-    // final drugListRef = database.child("/users/${user.uid}/Drugs");
+    todayDrugRef = database.child("/users/${user.uid}/medLogs");
     auth.userChanges().listen((event) {
       if (event != null && mounted) {
         setState(() {
@@ -87,9 +87,6 @@ class _AddMedPageState extends State<AddMedPage> {
 
   @override
   Widget build(BuildContext context) {
-    //print("love 1: ${scannedTextList.toString()}");
-    final todayDrugRef = database.child("/users/${user.uid}/medLogs");
-    final drugListRef = database.child("/users/${user.uid}/Drugs");
     var key = database.push().key;
     return Scaffold(
       appBar: AppBar(
@@ -224,42 +221,87 @@ class _AddMedPageState extends State<AddMedPage> {
                                     const SizedBox(
                                       height: 20,
                                     ),
-                                    if (scannedTextList == null)
-                                      const DropdownMenu(
-                                        onSelected: null,
-                                        dropdownMenuEntries: [],
-                                      ),
-                                    if (scannedTextList != null)
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          const Text("Please Select the name of This Drug"),
-                                          DropdownMenu<String>(
-                                            initialSelection: scannedTextList?.first,
-                                            onSelected: (String? value) {
-                                              // This is called when the user selects an item.
-                                              setState(() {
-                                                scannedTextList?.first = value!;
-                                                title = value!;
-                                              });
-                                            },
-                                            dropdownMenuEntries: scannedTextList!.map<DropdownMenuEntry<String>>((String value) {
-                                              return DropdownMenuEntry<String>(
-                                                  value: value,
-                                                  label: value
-
-                                              );
-                                            }).toList(),
-                                          ),
-                                        ],
-                                      )
+                                    scannedTextList == null || scannedTextList!.isEmpty
+                                        ? const DropdownMenu(
+                                          onSelected: null,
+                                          dropdownMenuEntries: [],
+                                        )
+                                        :Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            const Text("Please Select the name of This Drug"),
+                                            DropdownMenu<String>(
+                                              initialSelection: scannedTextList?.first,
+                                              onSelected: (String? value) {
+                                                // This is called when the user selects an item.
+                                                setState(() {
+                                                  scannedTextList?.first = value!;
+                                                  title = value!;
+                                                  scannedTextList?.first != null ? _controller.text = scannedTextList!.first : _controller.text = "default";
+                                                });
+                                              },
+                                              dropdownMenuEntries: scannedTextList!.map<DropdownMenuEntry<String>>((String value) {
+                                                return DropdownMenuEntry<String>(
+                                                    value: value,
+                                                    label: value
+                                                );
+                                              }).toList(),
+                                            ),
+                                            TextField(
+                                                controller: _controller,
+                                            ),
+                                          ],
+                                        ),
+                                    // if (scannedTextList == null)
+                                    //   const DropdownMenu(
+                                    //     onSelected: null,
+                                    //     dropdownMenuEntries: [],
+                                    //   ),
+                                    // if (scannedTextList != null)
+                                    //   Column(
+                                    //     mainAxisAlignment: MainAxisAlignment.center,
+                                    //     crossAxisAlignment: CrossAxisAlignment.center,
+                                    //     children: [
+                                    //       const Text("Please Select the name of This Drug"),
+                                    //       DropdownMenu<String>(
+                                    //         initialSelection: scannedTextList?.first,
+                                    //         onSelected: (String? value) {
+                                    //           // This is called when the user selects an item.
+                                    //           setState(() {
+                                    //             scannedTextList?.first = value!;
+                                    //             title = value!;
+                                    //             scannedTextList?.first != null ? _controller.text = scannedTextList!.first : _controller.text = "default";
+                                    //           });
+                                    //         },
+                                    //         dropdownMenuEntries: scannedTextList!.map<DropdownMenuEntry<String>>((String value) {
+                                    //           return DropdownMenuEntry<String>(
+                                    //               value: value,
+                                    //               label: value
+                                    //           );
+                                    //         }).toList(),
+                                    //       ),
+                                    //       TextField(
+                                    //           controller: _controller,
+                                    //       ),
+                                    //     ],
+                                    //   ),
                                   ],
-                                )),
+                                )
+                            ),
                           ),
                         ),
+
                         ElevatedButton(
-                          child: const Text("Update your Drug Now!"),
+                          child: const Text("Confirm your Drug Now!"),
+                          // onPressed: () {
+                          //   Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) => const ResultPage(),
+                          //     ),
+                          //   );
+                          // },
                           onPressed: !userInteracts() ? null : () async {
                             showDialog(
                                 context: context,
@@ -270,23 +312,18 @@ class _AddMedPageState extends State<AddMedPage> {
                                 });
                             final drugInput = <String, dynamic>{
                               "date": date.millisecondsSinceEpoch,
-                              "title": title,
+                              "title": _controller.text,
                               "description": description,
                               "medPicURL": await uploadDrugPics(key!),
-                              "medURL": "https://www.drugs.com/$title.html",
-                            };
-                            final drugListInput = <String, dynamic> {
-                              title: true,
+                              "medURL": "https://www.drugs.com/${_controller.text}.html",
+                              "morning": "true",
+                              "afternoon": "true",
+                              "evening": "true"
                             };
                             todayDrugRef
                                 .child(key!)
                                 .set(drugInput)
                                 .then((_) => print('Drug has been posted'))
-                                .catchError((error) => print("You got error on $error"));
-                            drugListRef
-                                .child(key!)
-                                .set(drugListInput)
-                                .then((_) => print('Drug List has been posted'))
                                 .catchError((error) => print("You got error on $error"));
                             await FirebaseFirestore.instance
                                 .collection("BeHealthyAppUsers")

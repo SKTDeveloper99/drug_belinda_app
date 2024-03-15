@@ -41,7 +41,6 @@ class _DrugTodayState extends State<DrugToday> {
 
   Future<void> init() async {
     final database = FirebaseDatabase.instance;
-    _superSearchTermsRef = database.ref('users/${user.uid}/Drugs');
     _messagesRef = database.ref('users/${user.uid}/medLogs');
     database.setLoggingEnabled(false);
 

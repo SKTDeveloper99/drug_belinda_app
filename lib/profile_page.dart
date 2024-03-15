@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:medical_app_belinda_full/AI_detector/text-detector.dart';
 import 'package:medical_app_belinda_full/calendar/calendar_page.dart';
 import 'package:medical_app_belinda_full/notifications.dart';
 import 'package:medical_app_belinda_full/screens/add_medicine.dart';
@@ -335,6 +333,18 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                       ),
+                      const Divider(),
+                      TextButton (
+                        onPressed: () async {
+                          await _deleteUser(context);
+                        },
+                        child: const Text(
+                          'Delete User',
+                          style: TextStyle(
+                            fontSize: 24,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -380,5 +390,30 @@ class _ProfilePageState extends State<ProfilePage> {
       Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
           const AuthInitializingPage()), (Route<dynamic> route) => false);
     }
+  }
+  Future<void> _deleteUser(BuildContext context) async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Do you want to delete Your User from this App?'),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  await auth.currentUser?.delete();
+                  // await  cloudFirestore.collection("user").doc(user.uid).delete();
+                },
+                child: const Text("Yes"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                },
+                child: const Text("Maybe Later"),
+              )
+            ],
+          );
+        }
+    );
   }
 }
