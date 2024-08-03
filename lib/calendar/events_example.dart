@@ -160,7 +160,7 @@ class TableEventsExampleState extends State<TableEventsExample> {
                       child: ListTile(
                         onTap: () {
                           //NotificationHelper().requestIOSPermissions();
-                          NotificationHelper().scheduledNotification(hour: 11, minutes: 55, id: 1);
+                          NotificationHelper().scheduledNotification(hour: 21, minutes: 46, id: 1);
                           // print('${value[index]}');
                         },
                         title: Text('${value[index]}'),
